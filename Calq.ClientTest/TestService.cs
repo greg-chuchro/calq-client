@@ -10,6 +10,10 @@ namespace Calq.ClientTest {
         }
 
         public TestService() {
+            list.Add(1);
+            list.Add(2);
+            dictionary.Add(0, 1);
+            dictionary.Add(1, 2);
         }
 
         public int integer;
@@ -18,5 +22,7 @@ namespace Calq.ClientTest {
         public Nested nullNested;
         public string text = "text";
         public string nullText;
+        public List<int> list = new();
+        public Dictionary<int, int> dictionary = new();
     }
 }

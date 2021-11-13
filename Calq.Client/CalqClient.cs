@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -47,87 +49,176 @@ namespace Calq.Client {
             var currentType = instance.GetType();
             var instanceStack = new Stack<object>();
 
-            reader.Read();
-            if (reader.TokenType != JsonTokenType.StartObject) {
-                throw new JsonException("json must be an object");
-            }
-
-            while (true) {
-                reader.Read();
-                string propertyName;
-                switch (reader.TokenType) {
-                    case JsonTokenType.PropertyName:
-                        propertyName = reader.GetString()!;
-                        break;
-                    case JsonTokenType.EndObject:
-                        if (instanceStack.Count == 0) {
-                            if (reader.Read()) {
-                                throw new JsonException();
-                            }
-                            return;
-                        }
-                        currentInstance = instanceStack.Pop();
-                        currentType = currentInstance.GetType();
-                        continue;
-                    default:
-                        throw new JsonException();
-                }
-
-                reader.Read();
-                object? value;
-                switch (reader.TokenType) {
-                    case JsonTokenType.False:
-                    case JsonTokenType.True:
-                        value = reader.GetBoolean();
-                        break;
-                    case JsonTokenType.String:
-                        value = reader.GetString();
-                        break;
-                    case JsonTokenType.Number:
-                        value = reader.GetInt32();
-                        break;
-                    case JsonTokenType.Null:
-                        value = null;
-                        break;
-                    default:
-                        switch (reader.TokenType) {
-                            case JsonTokenType.StartObject:
-                                instanceStack.Push(currentInstance);
-                                currentInstance = Reflection.GetOrInitializeFieldOrPropertyValue(currentType, currentInstance, propertyName);
-                                if (currentInstance == null) {
+            void ReadObject(ref Utf8JsonReader reader) {
+                while (true) {
+                    reader.Read();
+                    string propertyName;
+                    switch (reader.TokenType) {
+                        case JsonTokenType.PropertyName:
+                            propertyName = reader.GetString()!;
+                            break;
+                        case JsonTokenType.EndObject:
+                            if (instanceStack.Count == 0) {
+                                if (reader.Read()) {
                                     throw new JsonException();
                                 }
+                                return;
+                            }
+                            currentInstance = instanceStack.Pop();
+                            if (currentInstance is not ICollection) {
                                 currentType = currentInstance.GetType();
-                                break;
-                            case JsonTokenType.StartArray:
-                                break;
-                            default:
+                                continue;
+                            } else {
+                                currentType = currentInstance.GetType().GetGenericArguments()[0];
+                                return;
+                            }
+                        default:
+                            throw new JsonException();
+                    }
+
+                    reader.Read();
+                    object? value;
+                    switch (reader.TokenType) {
+                        case JsonTokenType.False:
+                        case JsonTokenType.True:
+                            value = reader.GetBoolean();
+                            break;
+                        case JsonTokenType.String:
+                            value = reader.GetString();
+                            break;
+                        case JsonTokenType.Number:
+                            value = reader.GetInt32();
+                            break;
+                        case JsonTokenType.Null:
+                            value = null;
+                            break;
+                        case JsonTokenType.StartObject:
+                            instanceStack.Push(currentInstance);
+                            currentInstance = Reflection.GetOrInitializeFieldOrPropertyValue(currentType, currentInstance, propertyName);
+                            if (currentInstance == null) {
                                 throw new JsonException();
-                        }
-                        continue;
+                            }
+                            currentType = currentInstance.GetType();
+                            continue;
+                        case JsonTokenType.StartArray:
+                            instanceStack.Push(currentInstance);
+                            value = Reflection.GetOrInitializeFieldOrPropertyValue(currentType, currentInstance, propertyName);
+                            if (currentInstance is not ICollection) {
+                                Reflection.SetFieldOrPropertyValue(currentType, currentInstance, propertyName, value);
+                            } else {
+                                Reflection.SetChildValue((ICollection)currentInstance, propertyName, value);
+                            }
+                            currentInstance = value;
+                            if (currentInstance == null) {
+                                throw new JsonException();
+                            }
+                            currentType = currentInstance.GetType().GetGenericArguments()[0];
+                            ReadArray(ref reader);
+                            continue;
+                        default:
+                            throw new JsonException();
+                    }
+                    if (currentInstance is not ICollection) {
+                        Reflection.SetFieldOrPropertyValue(currentType, currentInstance, propertyName, value);
+                    } else {
+                        Reflection.SetChildValue((ICollection)currentInstance, propertyName, value);
+                    }
                 }
-                Reflection.SetFieldOrPropertyValue(currentType, currentInstance, propertyName, value);
+            }
+
+            void ReadArray(ref Utf8JsonReader reader) {
+                while (true) {
+                    reader.Read();
+                    object? value;
+                    switch (reader.TokenType) {
+                        case JsonTokenType.False:
+                        case JsonTokenType.True:
+                            value = reader.GetBoolean();
+                            break;
+                        case JsonTokenType.String:
+                            value = reader.GetString();
+                            break;
+                        case JsonTokenType.Number:
+                            value = reader.GetInt32();
+                            break;
+                        case JsonTokenType.Null:
+                            value = null;
+                            break;
+                        case JsonTokenType.StartObject:
+                            instanceStack.Push(currentInstance);
+                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as List<object>).Count.ToString() }, null); // FIXME
+                            Reflection.AddChildValue((ICollection)currentInstance, currentInstance);
+                            currentInstance = value;
+                            if (currentInstance == null) {
+                                throw new JsonException();
+                            }
+                            currentType = currentInstance.GetType();
+                            ReadObject(ref reader);
+                            continue;
+                        case JsonTokenType.StartArray:
+                            instanceStack.Push(currentInstance);
+                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as List<object>).Count.ToString() }, null); // FIXME
+                            Reflection.AddChildValue((ICollection)currentInstance, currentInstance);
+                            currentInstance = value;
+                            if (currentInstance == null) {
+                                throw new JsonException();
+                            }
+                            currentType = currentInstance.GetType().GetGenericArguments()[0];
+                            continue;
+                        case JsonTokenType.EndArray:
+                            if (instanceStack.Count == 0) {
+                                if (reader.Read()) {
+                                    throw new JsonException();
+                                }
+                                return;
+                            }
+                            currentInstance = instanceStack.Pop();
+                            if (currentInstance is not ICollection) {
+                                currentType = currentInstance.GetType();
+                                return;
+                            } else {
+                                currentType = currentInstance.GetType().GetGenericArguments()[0];
+                                continue;
+                            }
+                            break;
+                        default:
+                            throw new JsonException();
+                    }
+                    Reflection.AddChildValue((ICollection)currentInstance, value);
+                }
+            }
+
+            reader.Read();
+            switch (reader.TokenType) {
+                case JsonTokenType.StartObject:
+                    ReadObject(ref reader);
+                    break;
+                case JsonTokenType.StartArray:
+                    ReadArray(ref reader);
+                    break;
+                default:
+                    throw new JsonException();
             }
         }
 
-        public void Get(CalqObject obj) {
+        public void Get(ICalqObject obj) {
             var response = Send(HttpMethod.Get, obj.Path);
             Populate(response.body, obj);
         }
 
-        public void Post(CalqObject obj) {
+        public void Post(ICalqObject obj) {
             Send(HttpMethod.Post, obj.Path, JsonSerializer.Serialize(obj, obj.GetType(), serializerOptions));
         }
 
-        public void Put(CalqObject obj) {
+        public void Put(ICalqObject obj) {
             Send(HttpMethod.Put, obj.Path, JsonSerializer.Serialize(obj, obj.GetType(), serializerOptions));
         }
 
-        public void Delete(CalqObject obj) {
+        public void Delete(ICalqObject obj) {
             Send(HttpMethod.Delete, obj.Path);
         }
 
-        public void Patch(CalqObject obj) {
+        public void Patch(ICalqObject obj) {
             Send(HttpMethod.Patch, obj.Path, JsonSerializer.Serialize(obj, obj.GetType(), serializerOptions));
         }
     }
