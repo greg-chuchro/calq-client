@@ -2,6 +2,7 @@
 
 using Calq.Client;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 
 namespace Calq.ClientTest {
@@ -32,6 +33,8 @@ namespace Calq.ClientTest {
             public Nested nullNested;
             public string text;
             public string nullText;
+            public CalqList<int> list;
+            public CalqDictionary<int, int> dictionary;
         }
     }
 }
