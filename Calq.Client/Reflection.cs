@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Reflection;
 
-namespace Calq.Client {
+namespace Ghbvft6.Calq.Client {
     internal class Reflection {
         public static object? GetFieldOrPropertyValue(object obj, string fieldOrPropertyName) {
             var type = obj.GetType();

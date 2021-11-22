@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-namespace Calq.Client {
+namespace Ghbvft6.Calq.Client {
     public class CalqClient {
 
         private readonly HttpClient client;
