@@ -1,4 +1,4 @@
-﻿namespace Calq.Client {
+﻿namespace Ghbvft6.Calq.Client {
     public abstract class CalqObject : ICalqObject {
         private readonly CalqObject parent;
         private readonly string name;

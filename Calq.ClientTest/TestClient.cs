@@ -1,11 +1,11 @@
 ﻿#pragma warning disable CS0649
 
-using Calq.Client;
+using Ghbvft6.Calq.Client;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace Calq.ClientTest {
+namespace Ghbvft6.Calq.ClientTest {
 
 
     public class TestClient : CalqClient {

@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using Xunit;
 
-namespace Calq.ClientTest {
+namespace Ghbvft6.Calq.ClientTest {
     public class CalqClientTest {
 
         protected TestService root = new();
