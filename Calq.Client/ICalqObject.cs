@@ -1,4 +1,4 @@
-﻿namespace Calq.Client {
+﻿namespace Ghbvft6.Calq.Client {
     public interface ICalqObject {
         protected ICalqObject Parent { get; }
         protected string Name { get; }

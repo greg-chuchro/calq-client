@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Calq.Client {
+namespace Ghbvft6.Calq.Client {
     public class CalqList<T> : ICalqObject, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IList {
         private readonly CalqObject parent;
         private readonly string name;
