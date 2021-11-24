@@ -76,5 +76,13 @@ namespace Calq.ClientTest {
             client.Delete(client.service.nested);
             Assert.Null(root.nested);
         }
+
+        [Fact]
+        public void Test5() {
+            client.Get(client.service);
+            client.service.listOfObjects[0].b = 2;
+            client.Patch(client.service.listOfObjects[0]);
+            Assert.Equal(Serialize(root.listOfObjects[0]), Serialize(client.service.listOfObjects[0]));
+        }
     }
 }

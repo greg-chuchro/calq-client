@@ -19,11 +19,11 @@ namespace Calq.ClientTest {
             public int a;
             public int b;
 
-            internal Nested(CalqObject parent, string name) : base(parent, name) { }
+            internal Nested(ICalqObject parent, string name) : base(parent, name) { }
         }
 
         public class TestService : CalqObject {
-            internal TestService(CalqObject parent, string name) : base(parent, name) {
+            internal TestService(ICalqObject parent, string name) : base(parent, name) {
                 nullNested = new(this, "nullNested"); // TODO https://github.com/greg-chuchro/calq-server/issues/8
             }
 
@@ -34,6 +34,7 @@ namespace Calq.ClientTest {
             public string text;
             public string nullText;
             public CalqList<int> list;
+            public CalqList<Nested> listOfObjects;
             public CalqDictionary<int, int> dictionary;
         }
     }

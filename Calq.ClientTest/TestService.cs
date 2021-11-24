@@ -14,6 +14,8 @@ namespace Calq.ClientTest {
             list.Add(2);
             dictionary.Add(0, 1);
             dictionary.Add(1, 2);
+            listOfObjects.Add(new Nested());
+            listOfObjects.Add(new Nested());
         }
 
         public int integer;
@@ -23,6 +25,7 @@ namespace Calq.ClientTest {
         public string text = "text";
         public string nullText;
         public List<int> list = new();
+        public List<Nested> listOfObjects = new();
         public Dictionary<int, int> dictionary = new();
     }
 }
