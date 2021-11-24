@@ -146,8 +146,8 @@ namespace Ghbvft6.Calq.Client {
                             break;
                         case JsonTokenType.StartObject:
                             instanceStack.Push(currentInstance);
-                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as List<object>).Count.ToString() }, null); // FIXME
-                            Reflection.AddChildValue((ICollection)currentInstance, currentInstance);
+                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as IList).Count.ToString() }, null); // FIXME
+                            Reflection.AddChildValue((ICollection)currentInstance, value);
                             currentInstance = value;
                             if (currentInstance == null) {
                                 throw new JsonException();
@@ -157,8 +157,8 @@ namespace Ghbvft6.Calq.Client {
                             continue;
                         case JsonTokenType.StartArray:
                             instanceStack.Push(currentInstance);
-                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as List<object>).Count.ToString() }, null); // FIXME
-                            Reflection.AddChildValue((ICollection)currentInstance, currentInstance);
+                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as IList).Count.ToString() }, null); // FIXME
+                            Reflection.AddChildValue((ICollection)currentInstance, value);
                             currentInstance = value;
                             if (currentInstance == null) {
                                 throw new JsonException();
