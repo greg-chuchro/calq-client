@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -146,7 +145,7 @@ namespace Ghbvft6.Calq.Client {
                             break;
                         case JsonTokenType.StartObject:
                             instanceStack.Push(currentInstance);
-                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as IList).Count.ToString() }, null); // FIXME
+                            value = Activator.CreateInstance(currentType); // FIXME
                             Reflection.AddChildValue((ICollection)currentInstance, value);
                             currentInstance = value;
                             if (currentInstance == null) {
@@ -157,7 +156,7 @@ namespace Ghbvft6.Calq.Client {
                             continue;
                         case JsonTokenType.StartArray:
                             instanceStack.Push(currentInstance);
-                            value = Activator.CreateInstance(currentType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { currentInstance, (currentInstance as IList).Count.ToString() }, null); // FIXME
+                            value = Activator.CreateInstance(currentType); // FIXME
                             Reflection.AddChildValue((ICollection)currentInstance, value);
                             currentInstance = value;
                             if (currentInstance == null) {

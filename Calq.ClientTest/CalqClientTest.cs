@@ -1,4 +1,6 @@
+using Ghbvft6.Calq.ClientTest.Calq;
 using Ghbvft6.Calq.Server;
+using System;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -41,6 +43,12 @@ namespace Ghbvft6.Calq.ClientTest {
             return JsonSerializer.Serialize(instance, serializerOptions);
         }
 
+        protected string SerializeDeserialize(object instance, Type type) {
+            var serialized = Serialize(instance);
+            var deserialized = JsonSerializer.Deserialize(serialized, type);
+            return Serialize(deserialized);
+        }
+
         [Fact]
         public void Test0() {
             Assert.NotNull(root.nested);
@@ -53,7 +61,7 @@ namespace Ghbvft6.Calq.ClientTest {
         [Fact]
         public void Test1() {
             client.Get(client.service);
-            Assert.Equal(Serialize(root), Serialize(client.service));
+            Assert.Equal(SerializeDeserialize(root, root.GetType()), SerializeDeserialize(client.service, root.GetType()));
         }
 
         [Fact]
@@ -81,6 +89,22 @@ namespace Ghbvft6.Calq.ClientTest {
         public void Test5() {
             client.Get(client.service);
             client.service.listOfObjects[0].b = 2;
+            client.Patch(client.service.listOfObjects[0]);
+            Assert.Equal(Serialize(root.listOfObjects[0]), Serialize(client.service.listOfObjects[0]));
+        }
+
+        [Fact]
+        public void Test6() {
+            client.Get(client.service);
+            client.service.nested = new Nested() { b = 2 };
+            client.Put(client.service.nested);
+            Assert.Equal(Serialize(root.nested), Serialize(client.service.nested));
+        }
+
+        [Fact]
+        public void Test7() {
+            client.Get(client.service);
+            client.service.listOfObjects[0] = new Nested() { b = 2 };
             client.Patch(client.service.listOfObjects[0]);
             Assert.Equal(Serialize(root.listOfObjects[0]), Serialize(client.service.listOfObjects[0]));
         }

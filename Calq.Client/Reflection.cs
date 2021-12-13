@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Reflection;
 
 namespace Ghbvft6.Calq.Client {
     internal class Reflection {
@@ -24,7 +23,7 @@ namespace Ghbvft6.Calq.Client {
             if (field != null) {
                 value = field.GetValue(obj);
                 if (value == null) {
-                    value = Activator.CreateInstance(field.FieldType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { obj, fieldOrPropertyName }, null);
+                    value = Activator.CreateInstance(field.FieldType);
                     field.SetValue(obj, value);
                 }
                 return value;
@@ -33,7 +32,7 @@ namespace Ghbvft6.Calq.Client {
                 if (property != null) {
                     value = property.GetValue(obj);
                     if (value == null) {
-                        value = Activator.CreateInstance(property.PropertyType, BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { obj, fieldOrPropertyName }, null);
+                        value = Activator.CreateInstance(property.PropertyType);
                         property.SetValue(obj, value);
                     }
                     return value;
