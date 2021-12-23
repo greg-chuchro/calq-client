@@ -24,6 +24,7 @@ namespace Ghbvft6.Calq.ClientTest {
             private Nested? _nullNested;
             private CalqList<int>? _list;
             private CalqObjectList<Nested>? _listOfObjects;
+            private CalqObjectDictionary<int, Nested>? _dictionaryOfObjects;
 
             public TestService() {
                 nullNested = new(); // TODO https://github.com/greg-chuchro/calq-server/issues/8
@@ -38,6 +39,7 @@ namespace Ghbvft6.Calq.ClientTest {
             public CalqList<int>? list { get => _list; set { value?.Attach(this, nameof(list)); _list = value; } }
             public CalqObjectList<Nested>? listOfObjects { get => _listOfObjects; set { value?.Attach(this, nameof(listOfObjects)); _listOfObjects = value; } }
             public CalqDictionary<int, int>? dictionary;
+            public CalqObjectDictionary<int, Nested>? dictionaryOfObjects { get => _dictionaryOfObjects; set { value?.Attach(this, nameof(dictionaryOfObjects)); _dictionaryOfObjects = value; } }
         }
     }
 }
