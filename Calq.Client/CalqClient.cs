@@ -93,7 +93,11 @@ namespace Ghbvft6.Calq.Client {
                             break;
                         case JsonTokenType.StartObject:
                             instanceStack.Push(currentInstance);
-                            currentInstance = Reflection.GetOrInitializeFieldOrPropertyValue(currentType, currentInstance, propertyName);
+                            if (currentInstance is not ICollection) {
+                                currentInstance = Reflection.GetOrInitializeFieldOrPropertyValue(currentType, currentInstance, propertyName);
+                            } else {
+                                currentInstance = Reflection.GetOrInitializeChildValue((ICollection)currentInstance, propertyName);
+                            }
                             if (currentInstance == null) {
                                 throw new JsonException();
                             }

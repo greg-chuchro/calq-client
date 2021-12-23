@@ -108,5 +108,29 @@ namespace Ghbvft6.Calq.ClientTest {
             client.Patch(client.service.listOfObjects[0]);
             Assert.Equal(Serialize(root.listOfObjects[0]), Serialize(client.service.listOfObjects[0]));
         }
+
+        [Fact]
+        public void Test8() {
+            client.Get(client.service);
+            client.service.listOfObjects[0].b = 2;
+            client.Patch(client.service.listOfObjects[0]);
+            Assert.Equal(Serialize(root.listOfObjects[0]), Serialize(client.service.listOfObjects[0]));
+        }
+
+        [Fact]
+        public void Test9() {
+            client.Get(client.service);
+            client.service.dictionaryOfObjects[0] = new Nested() { b = 2 };
+            client.Patch(client.service.dictionaryOfObjects[0]);
+            Assert.Equal(Serialize(root.dictionaryOfObjects[0]), Serialize(client.service.dictionaryOfObjects[0]));
+        }
+
+        [Fact]
+        public void Test10() {
+            client.Get(client.service);
+            client.service.dictionaryOfObjects[0].b = 2;
+            client.Patch(client.service.dictionaryOfObjects[0]);
+            Assert.Equal(Serialize(root.dictionaryOfObjects[0]), Serialize(client.service.dictionaryOfObjects[0]));
+        }
     }
 }

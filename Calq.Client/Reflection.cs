@@ -186,6 +186,34 @@ namespace Ghbvft6.Calq.Client {
             };
         }
 
+        public static object? GetOrInitializeChildValue(ICollection collection, string key) {
+            switch (collection) {
+                case Array array:
+                    var arrayMemberValue = array.GetValue(int.Parse(key));
+                    if (arrayMemberValue == null) {
+                        arrayMemberValue = Activator.CreateInstance(array.GetType().GetElementType()!);
+                        array.SetValue(arrayMemberValue, int.Parse(key));
+                    }
+                    return arrayMemberValue;
+                case IList list:
+                    var listMemberValue = list[int.Parse(key)];
+                    if (listMemberValue == null) {
+                        listMemberValue = Activator.CreateInstance(list.GetType().GetGenericArguments()[0]!);
+                        list[int.Parse(key)] = listMemberValue;
+                    }
+                    return listMemberValue;
+                case IDictionary dictionary:
+                    var dictionaryMemberValue = dictionary[ParseValue(dictionary.GetType().GetGenericArguments()[0], key)];
+                    if (dictionaryMemberValue == null) {
+                        dictionaryMemberValue = Activator.CreateInstance(dictionary.GetType().GetGenericArguments()[1]!);
+                        dictionary[ParseValue(dictionary.GetType().GetGenericArguments()[0], key)] = dictionaryMemberValue;
+                    }
+                    return dictionaryMemberValue;
+                default:
+                    throw new Exception("unsupported collection");
+            }
+        }
+
         public static void SetChildValue(ICollection collection, string key, object? value) {
             switch (collection) {
                 case Array array:
