@@ -16,6 +16,8 @@ namespace Ghbvft6.Calq.ClientTest {
             dictionary.Add(1, 2);
             listOfObjects.Add(new Nested());
             listOfObjects.Add(new Nested());
+            dictionaryOfObjects.Add(0, new Nested());
+            dictionaryOfObjects.Add(1, new Nested());
         }
 
         public int integer;
@@ -27,5 +29,6 @@ namespace Ghbvft6.Calq.ClientTest {
         public List<int> list = new();
         public List<Nested> listOfObjects = new();
         public Dictionary<int, int> dictionary = new();
+        public Dictionary<int, Nested> dictionaryOfObjects = new();
     }
 }

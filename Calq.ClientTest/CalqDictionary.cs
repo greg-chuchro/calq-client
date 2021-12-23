@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace Ghbvft6.Calq.ClientTest {
 
-    // TODO CalqObjectDictionary
     public class CalqDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ICalqObject where TKey : notnull {
         internal ICalqObject? Parent { get; set; }
         internal string? Name { get; set; }
